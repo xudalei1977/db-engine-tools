@@ -3,10 +3,13 @@ import sys, time, logging, threading, random, os
 import psycopg2
 from datetime import datetime
 import boto3
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 gStartTime = 0
 gEndTime = 0
-gHost = "gp-bp10cn2866q7t90ub-master.gpdb.rds.aliyuncs.com"
+gHost = "am-bp1z0ir9k33fkr21590650.ads.aliyuncs.com"
 gOss = "oss://dalei-demo/cdn"
 gDir = "/home/ec2-user"
 
@@ -19,6 +22,12 @@ class adbUnloadThread(threading.Thread):
         self.tableName = tableName
         self.directory = directory
 
+        self.conn = pymysql.connect(host='am-bp1z0ir9k33fkr21590650.ads.aliyuncs.com',
+                                        port=3306, user='admin', passwd='******', db='dev')
+
+                self.conn.autocommit = True
+                self.cursor = self.conn.cursor()
+
     def run(self):
         print("********** %s start at := " % (self.getName()))
         global gEndTime
@@ -30,12 +39,16 @@ class adbUnloadThread(threading.Thread):
         mylock.release()
 
     def unload_table(self):
-        pass_cmd = "export PGPASSWORD=******;"
-        unload_cmd = "psql -h %s -p 5432 -U postgres -d dev -q -c \"\\COPY %s TO '%s/%s.csv'\"" % (gHost, self.tableName, self.directory, self.tableName)
-        os.system(pass_cmd + unload_cmd)
+        #unload_cmd = "psql -h %s -p 5432 -U postgres -d dev -q -c \"\\COPY %s TO '%s/%s.csv'\"" % (gHost, self.tableName, self.directory, self.tableName)
+        #os.system(pass_cmd + unload_cmd)
+        cursor.execute("SELECT * FROM %s" % self.tableName)
+        data = cursor.fetchall()
+        df = pd.DataFrame(data)
+        table = pa.Table.from_pandas(df)
+        pq.write_table(table, self.directory + "/" + self.tableName + ".parquet")
 
         # zip and upload to oss
-        os.system("gzip %s/%s.csv" % (self.directory, self.tableName))
+        os.system("gzip %s/%s.parquet" % (self.directory, self.tableName))
         os.system("ossutil cp %s/%s" % (gOss, dir))
 
         # send message to SQS
@@ -54,10 +67,9 @@ if __name__ == "__main__":
 
     # iterate all tables
     try:
-        conn = psycopg2.connect(host=gHost,
-                                port=5432, dbname="dev",
-                                user="postgres", password="******")
-        sql = "select tablename from pg_tables where schemaname = 'public'"
+        conn = pymysql.connect(host=gHost,
+                               port=3306, user='admin', passwd='******', db='dev')
+        sql = "show tables"
         conn.autocommit = True
         cursor = conn.cursor()
         cursor.execute(sql)
@@ -67,12 +79,12 @@ if __name__ == "__main__":
             print("the table is := %s" % row[0])
             t = adbUnloadThread(threadId, row[0], gDir + "/" + curr_dir)
             t.start()
-        cur.close()    # 关闭游标
+        cur.close()
     except (Exception, DatabaseError) as e:
-        print("连接 PostgreSQL 失败：", e)
+        print("connect adm-mysql failed: ", e)
     finally:
-        if connection is not None:    # 释放数据库连接
+        if connection is not None:]
             connection.close()
-            print("PostgreSQL 数据库连接已关闭。")
+            print("adb-mysql is closed.")
 
 

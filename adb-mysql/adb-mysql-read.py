@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys, datetime, time, logging, threading, random
-import psycopg2
+import pymysql
 
 gReadRecord = 0
 gStartTime = 0
@@ -17,10 +17,8 @@ class readThread(threading.Thread):
         self.recordsPerThread = recordsPerThread
         self.threadId = threadId
 
-        self.conn = psycopg2.connect(host="hgpostcn-cn-zxu38wmbn001-cn-hangzhou-vpc-st.hologres.aliyuncs.com",
-                                port=80, dbname="dev",
-                                user="Access_Key*******", password="Secret_Key*******")
-
+        self.conn = pymysql.connect(host='am-bp1z0ir9k33fkr21590650.ads.aliyuncs.com',
+                                        port=3306, user='admin', passwd='******', db='dev')
         self.conn.autocommit = True
         self.cursor = self.conn.cursor()
 

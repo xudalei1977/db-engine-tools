@@ -16,7 +16,7 @@ class writeThread(threading.Thread):
         self.recordsPerThread = recordsPerThread
         self.threadId = threadId
 
-        self.conn = pymysql.connect(host='am-bp1450e89xc2004xj167320.ads.aliyuncs.com',
+        self.conn = pymysql.connect(host='am-bp1z0ir9k33fkr21590650.ads.aliyuncs.com',
                                 port=3306, user='admin', passwd='******', db='dev')
 
         self.conn.autocommit = True
