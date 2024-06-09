@@ -99,11 +99,11 @@ if __name__ == "__main__":
             print("the table is := %s" % row[0])
             t = adbUnloadThread(threadId, row[0], gDir + "/" + curr_dir, gOss + "/" + curr_dir)
             t.start()
-        cursor.close()    # 关闭游标
+        cursor.close()
     except (Exception) as e:
-        print("连接 PostgreSQL 失败：", e)
+        print("connect PostgreSQL failed : ", e)
     finally:
-        if conn is not None:    # 释放数据库连接
+        if conn is not None:
             conn.close()
-            print("PostgreSQL 数据库连接已关闭。")
+            print("PostgreSQL is closed。")
 

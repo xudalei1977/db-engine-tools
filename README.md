@@ -70,7 +70,7 @@ ossutil config
 * 启动样例
 
 ```shell
-python3 adb-mysql-read.py 100 10000
+python3 redshift-read-1.py 100 10000
 ```
 
 ###### 3.2.2 adb-mysql-write.py
