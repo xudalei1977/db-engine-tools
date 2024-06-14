@@ -17,16 +17,16 @@ class Task:
         self.cursor.execute('SET enable_result_cache_for_session TO false')
 
     def _run_sql_with_result(self):
-#         param_array = [(2, 161, 142, 1),
-#                        (1, 68,  249, 1),
-#                        (2, 161, 233, 2),
-#                        (2, 107, 236, 1),
-#                        (2, 255, 234, 1),
-#                        (2, 237, 236, 1),
-#                        (2, 41,  238, 0),
-#                        (2, 121, 197, 2),
-#                        (1, 163, 262, 1),
-#                        (2, 142, 151, 2) ]
+        param_array = [(2, 161, 142, 1),
+                       (1, 68,  249, 1),
+                       (2, 161, 233, 2),
+                       (2, 107, 236, 1),
+                       (2, 255, 234, 1),
+                       (2, 237, 236, 1),
+                       (2, 41,  238, 0),
+                       (2, 121, 197, 2),
+                       (1, 163, 262, 1),
+                       (2, 142, 151, 2) ]
         tpep_pickup_datetime_begin = '2023-01-01 00:00:00'
         tpep_pickup_datetime_end = '2023-01-01 06:30:00'
         for i in range(0, self.recordsPerThread):
@@ -34,8 +34,8 @@ class Task:
                      where "VendorID" = %s
                      and "tpep_pickup_datetime" >= to_timestamp(%s, 'YYYY-MM-DD HH24:MI:SS') and "tpep_pickup_datetime" < to_timestamp(%s, 'YYYY-MM-DD HH24:MI:SS')
                      and "PULocationID" = %s and "DOLocationID" = %s and "payment_type" = %s'''
-            #self.cursor.execute(sql_detail, (param_array[i%10][0], tpep_pickup_datetime_begin, tpep_pickup_datetime_end, param_array[i%10][1], param_array[i%10][2], param_array[i%10][3]))
-            self.cursor.execute(sql_detail, (random.randrange(1, 3), tpep_pickup_datetime_begin, tpep_pickup_datetime_end, random.randrange(1, 266), random.randrange(1, 266), random.randrange(1, 7)))
+            self.cursor.execute(sql_detail, (param_array[i%10][0], tpep_pickup_datetime_begin, tpep_pickup_datetime_end, param_array[i%10][1], param_array[i%10][2], param_array[i%10][3]))
+            #self.cursor.execute(sql_detail, (random.randrange(1, 3), tpep_pickup_datetime_begin, tpep_pickup_datetime_end, random.randrange(1, 266), random.randrange(1, 266), random.randrange(1, 7)))
             row_detail = self.cursor.fetchone()
         return (0 if row_detail[0] is None else row_detail[0])
 

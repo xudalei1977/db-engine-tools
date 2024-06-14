@@ -13,16 +13,16 @@ class Task:
         self.cursor = self.conn.cursor()
 
     def _run_sql_with_result(self):
-#         param_array = [(2, 161, 142, 1),
-#                        (1, 68,  249, 1),
-#                        (2, 161, 233, 2),
-#                        (2, 107, 236, 1),
-#                        (2, 255, 234, 1),
-#                        (2, 237, 236, 1),
-#                        (2, 41,  238, 0),
-#                        (2, 121, 197, 2),
-#                        (1, 163, 262, 1),
-#                        (2, 142, 151, 2) ]
+        param_array = [(2, 161, 142, 1),
+                       (1, 68,  249, 1),
+                       (2, 161, 233, 2),
+                       (2, 107, 236, 1),
+                       (2, 255, 234, 1),
+                       (2, 237, 236, 1),
+                       (2, 41,  238, 0),
+                       (2, 121, 197, 2),
+                       (1, 163, 262, 1),
+                       (2, 142, 151, 2) ]
         VendorID = random.randrange(1, 3)
         agg_date = '2023-01-01'
         PULocationID = random.randrange(1, 266)
@@ -34,16 +34,16 @@ class Task:
         for i in range(0, self.recordsPerThread):
             sql_sum = '''select sum(fare_amount) from taxi_trips_agg.nyc_hour_aggregation
                      where VendorID = %s and agg_date = str_to_date(%s, '%%Y-%%m-%%d') and PULocationID = %s and DOLocationID = %s and payment_type = %s and agg_hour <= %s '''
-            #self.cursor.execute(sql_sum, (param_array[i%10][0], agg_date, param_array[i%10][1], param_array[i%10][2], param_array[i%10][3], agg_hour))
-            self.cursor.execute(sql_sum, (VendorID, agg_date, PULocationID, DOLocationID, payment_type, agg_hour))
+            self.cursor.execute(sql_sum, (param_array[i%10][0], agg_date, param_array[i%10][1], param_array[i%10][2], param_array[i%10][3], agg_hour))
+            #self.cursor.execute(sql_sum, (VendorID, agg_date, PULocationID, DOLocationID, payment_type, agg_hour))
             row = self.cursor.fetchone()
             row_sum = 0 if row[0] is None else row[0]
 
             sql_detail = '''select sum(fare_amount) from taxi_trips.nyc_source
                      where tpep_pickup_datetime >= str_to_date(%s, '%%Y-%%m-%%d %%H:%%i:%%s') and tpep_pickup_datetime < str_to_date(%s, '%%Y-%%m-%%d %%H:%%i:%%s')
                      and VendorID = %s and PULocationID = %s and DOLocationID = %s and payment_type = %s'''
-            #self.cursor.execute(sql_detail, (param_array[i%10][0], tpep_pickup_datetime_begin, tpep_pickup_datetime_end, param_array[i%10][1], param_array[i%10][2], param_array[i%10][3]))
-            self.cursor.execute(sql_detail, (tpep_pickup_datetime_begin, tpep_pickup_datetime_end, VendorID, PULocationID, DOLocationID, payment_type))
+            self.cursor.execute(sql_detail, (param_array[i%10][0], tpep_pickup_datetime_begin, tpep_pickup_datetime_end, param_array[i%10][1], param_array[i%10][2], param_array[i%10][3]))
+            #self.cursor.execute(sql_detail, (tpep_pickup_datetime_begin, tpep_pickup_datetime_end, VendorID, PULocationID, DOLocationID, payment_type))
             row = self.cursor.fetchone()
             row_detail = 0 if row[0] is None else row[0]
 
